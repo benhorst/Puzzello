@@ -11,9 +11,11 @@
             if (args.detail.previousExecutionState !== activation.ApplicationExecutionState.terminated) {
                 // TODO: This application has been newly launched. Initialize
                 // your application here.
+                initialize();
             } else {
                 // TODO: This application has been reactivated from suspension.
                 // Restore application state here.
+                app.launch();
             }
             args.setPromise(WinJS.UI.processAll());
         }
@@ -29,4 +31,35 @@
     };
 
     app.start();
+
+    function initialize() {
+        var player = new Player();
+        var playspace = Playspace.newGame(player);
+        getById("play-container").appendChild(playspace.constructHtml());
+
+        var mte = MoveCard.TileEnum;
+        var cards = [
+            [[mte.empty, mte.empty, mte.empty],
+              [mte.add, mte.remove, mte.add],
+              [mte.empty, mte.empty, mte.empty]],
+
+            [[mte.add, mte.empty, mte.empty],
+              [mte.empty, mte.remove, mte.empty],
+              [mte.empty, mte.empty, mte.add]],
+
+            [[mte.empty, mte.add, mte.empty],
+              [mte.empty, mte.remove, mte.empty],
+              [mte.empty, mte.add, mte.empty]],
+
+            [[mte.empty, mte.empty, mte.add],
+              [mte.empty, mte.remove, mte.empty],
+              [mte.add, mte.empty, mte.empty]],
+        ].map(
+            MoveCard.createWithData
+        ).map(function (card) {
+            getById("hand-container").appendChild(card.toHtml());
+        })
+
+       
+    }
 })();
