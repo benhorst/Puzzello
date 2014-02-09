@@ -63,7 +63,12 @@
     <Content Include="js\core.js" />
     <Content Include="js\default.js" />
     <Content Include="css\default.css" />
+    <Content Include="js\hand.js" />
+    <Content Include="js\move.js" />
+    <Content Include="js\player.js" />
+    <Content Include="js\playspace.js" />
     <Content Include="js\test.js" />
+    <Content Include="js\tests.js" />
     <Content Include="js\utils.js" />
     <None Include="Puzzello_TemporaryKey.pfx" />
   </ItemGroup>

@@ -56,10 +56,25 @@
               [mte.add, mte.empty, mte.empty]],
         ].map(
             MoveCard.createWithData
-        ).map(function (card) {
-            getById("hand-container").appendChild(card.toHtml());
-        })
+        );
 
-       
+        var hand = new Hand(cards, player, playspace);
+
+        cards.forEach(function (card) {
+            card.getHtmlNode().addEventListener('click', MoveCard.onclick(card), false);
+        });
+        
+        getById("hand-container").appendChild(hand.getHtmlNode());
+
+
+/*testing*/
+        var move = new Move(player, cards[1], new RowCol(1, 1));
+        playspace.applyMove(move);
+        getById("play-container").appendChild(playspace.constructHtml());
+
+        move = new Move(player, cards[0], new RowCol(0, 0));
+        playspace.applyMove(move);
+        getById("play-container").appendChild(playspace.constructHtml());
+/*end testing*/
     }
 })();
