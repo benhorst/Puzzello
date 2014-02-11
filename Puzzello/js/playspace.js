@@ -1,10 +1,6 @@
 ﻿(function () {
     'use strict';
     function Playspace() {
-        this.moves = [];
-        this.state = new Playstate();
-        this.activeMove = null;
-
         this.computeCurrentState = function (playstate) {
             var playstate = playstate || new Playstate();
             this.moves.forEach(function (move) {
@@ -17,17 +13,20 @@
         this.applyMove = function (move) {
             this.state.applyMove(move, {});
             this.moves.push(move);
+            this.updateView();
         }
 
         // place a possible move in the active slot (show to players, allow to confirm)
         this.setActiveMove = function (card) {
-            this.activeMove = card;
+            this.activeMove = new Move(card, new RowCol(0, 0));
+            this.updateView();
         }
 
         this.updateView = function () {
-
+            this.htmlNode.refresh();
         }
 
+        // honestly I'm not sure if this is useful
         this.speculateApplyMove = function (move) {
             return this.state.copy().applyMove(move);
         }
@@ -35,6 +34,7 @@
         this.constructHtml = function () {
             var container = createWithClass("div", "playspace");
 
+            // todo: check for active move and set the move as some sort of overlay class that displays the outcome
             this.state.data.forEach(function (row, x) {
                 var rowEl = createWithClass("div", "row");
                 row.forEach(function (item, y) {
@@ -50,7 +50,28 @@
                 });
                 container.appendChild(rowEl);
             });
+
+            // make required UI with buttons for cancel/commit actions (should be temporary)
+            // eventually, this UI interaction will be more intuitive, but we'll use some clunky UI to prototype
+            var cancelButton = createWithClass("input", "play-cancel");
+            cancelButton.setAttribute("type", "button");
+            cancelButton.addEventListener('click', function () { this.cancelActiveMove(); }, false);
+            cancelButton.value = "Cancel Move";
+
+            var commitMoveButton = createWithClass("input", "play-commit");
+            commitMoveButton.setAttribute("type", "button");
+            commitMoveButton.addEventListener('click', function () { this.applyMove(this.activeMove); }, false);
+            commitMoveButton.value = "Commit Move";
+
+            container.appendChild(cancelButton);
+            container.appendChild(commitMoveButton);
+
             return container;
+        }
+
+        this.cancelActiveMove = function () {
+            this.activeMove = null;
+            this.updateView();
         }
 
         this.handleTileClick = function (ev, x, y) {
@@ -64,12 +85,22 @@
             }
         }
 
+        this.cancelActiveMove = function () {
+            this.activeMove = null;
+            this.updateView();
+        }
+
         function tileClickHandler(playspace, x, y) {
             return function (ev) {
                 playspace.handleTileClick(ev, x, y);
             }
 
         }
+
+        this.moves = [];
+        this.state = new Playstate();
+        this.activeMove = null;
+        this.htmlNode = new HtmlNodeManager(this, this.constructHtml);
     }
 
     Playspace.newGame = function (player) {

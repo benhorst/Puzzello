@@ -8,10 +8,6 @@
 
     // a class to represent a move card owned/held by a player
     function MoveCard() {
-        this.data = MoveCard.DefaultTileData;
-        var htmlNode = new HtmlNodeManager(this, this.toHtml);
-        var dirty = false;
-
         this.setData = function (data) {
             // TODO: validate and stuff. possibly remove/replace htmlnode
             this.data = data;
@@ -34,6 +30,10 @@
 
             return container;
         }
+
+        this.data = MoveCard.DefaultTileData;
+        var htmlNode = new HtmlNodeManager(this, this.toHtml);
+        var dirty = false;
     }
     MoveCard.onclick = function (card) {
         return function (ev) {

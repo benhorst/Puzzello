@@ -10,7 +10,7 @@
 
         this.notifyCardClick = function (card) {
             if (playspace) {
-                playspace.setMove(card, Playspace.CardMoves.prospective);
+                playspace.setActiveMove(card);
             } else {
                 console.warn("handInstance.notifyCardClick: a card has been clicked, but the hand has no playspace.")
                 console.warn(hand);

@@ -10,6 +10,7 @@ function htmlNodeManager(owner, constructfunc) {
     Object.defineProperty(this, 'isDirty', { get: getDirty, configurable:false });
     Object.defineProperty(this, 'node', { get: getNode, configurable:false });
     Object.defineProperty(this, 'construct', { value: construct, writeable: false, configurable: false });
+    Object.defineProperty(this, 'refresh', { value: refresh, writeable: false, configurable: false });
 
     function getNode() {
         if (!node || dirty) {
@@ -19,12 +20,18 @@ function htmlNodeManager(owner, constructfunc) {
         return node;
     }
 
+    function refresh() {
+        dirty = true;
+        construct();
+    }
+
     function getDirty() {
         return dirty;
     }
 
     function construct() {
         node = constructFunc.call(owner);
+        dirty = false;
     }
 
     if(owner) owner.getHtmlNode = getNode;

@@ -35,7 +35,7 @@
     function initialize() {
         var player = new Player();
         var playspace = Playspace.newGame(player);
-        getById("play-container").appendChild(playspace.constructHtml());
+        getById("play-container").appendChild(playspace.getHtmlNode());
 
         var mte = MoveCard.TileEnum;
         var cards = [
