@@ -33,7 +33,7 @@
 
         this.constructHtml = function () {
             var container = createWithClass("div", "playspace");
-
+            var instance = this;
             // todo: check for active move and set the move as some sort of overlay class that displays the outcome
             this.state.data.forEach(function (row, x) {
                 var rowEl = createWithClass("div", "row");
@@ -45,7 +45,18 @@
                     } else {
                         tileEl.textContent = "";
                     }
-                    rowEl.addEventListener('click', tileClickHandler(this, x, y), false);
+
+                    // check if in the bounds of the current move
+                    if (instance.activeMove) {
+                        var colpos = instance.activeMove.position.col - x;
+                        var rowpos = instance.activeMove.position.row - y;
+                        if (colpos > 0 && instance.activeMove.card.data[colpos]
+                            && rowpos > 0 && instance.activeMove.card.data[rowpos]) {
+
+                        }
+                    }
+
+                    rowEl.addEventListener('click', tileClickHandler(instance, x, y), false);
                     rowEl.appendChild(tileEl);
                 });
                 container.appendChild(rowEl);
@@ -121,28 +132,8 @@
                 for (var j = 0; j < move.card.data[i].length; j++) {
                     var y = j + move.position.row;
                     if (y < 0 || y >= this.data[i].length) continue;
-                    switch (move.card.data[i][j]) {
-                        case MoveCard.TileEnum.add:
-                            // todo: check if valid -- can "add" requests overwrite currently filled tiles?
-                            this.data[x][y] = move.player;
-                            break;
-                        case MoveCard.TileEnum.remove:
-                            // if(data != player) throw InvalidMoveError cannot remove on anything other than the player's tile
-                            this.data[x][y] = 0;
-                            break;
-                        case MoveCard.TileEnum.require:
-                            // if(this.data != player) throw InvalidMoveError must be current player's tile
-                            break;
-                        case MoveCard.TileEnum.multiply:
-                            // todo: check if valid, do something more than add a plain marker
-                            this.data[x][y] = move.player;
-                            break;
-                        case MoveCard.TileEnum.empty:
-                            break;
-                        default:
-                            throw (new Error("unrecognized MoveCard action"));
-                            break;
-                    }
+
+                    this.data[x][y] = Playstate.applySingleTileMove(this.data[x][y], move.card.data[i][j], move);
                 }
             }
             return this;
@@ -154,6 +145,36 @@
             return state;
         }
     }
+    Playstate.applySingleTileMove = function (current, applied, move) {
+        var result = current;
+        switch (applied) {
+            case MoveCard.TileEnum.add:
+                // todo: check if valid -- can "add" requests overwrite currently filled tiles?
+                result = move.player;
+                break;
+            case MoveCard.TileEnum.remove:
+                // if(data != player) throw InvalidMoveError cannot remove on anything other than the player's tile
+                if (current == MoveCard.TileEnum.empty) {
+                    throw (new Error("Invalid Move: cannot place a tile here"));
+                }
+                result = MoveCard.TileEnum.empty;
+                break;
+            case MoveCard.TileEnum.require:
+                // if(this.data != player) throw InvalidMoveError must be current player's tile
+                break;
+            case MoveCard.TileEnum.multiply:
+                // todo: check if valid, do something more than add a plain marker
+                current = move.player;
+                break;
+            case MoveCard.TileEnum.empty:
+                break;
+            default:
+                throw (new Error("unrecognized MoveCard action"));
+                break;
+        }
+        return result;
+    }
+
     // return a new instance of a 5x5 empty array
     Playstate.fiveByFiveEmpty = function () {
         return [

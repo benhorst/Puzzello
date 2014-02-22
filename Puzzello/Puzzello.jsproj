@@ -70,6 +70,7 @@
     <Content Include="js\test.js" />
     <Content Include="js\tests.js" />
     <Content Include="js\utils.js" />
+    <Content Include="current thoughts.txt" />
     <None Include="Puzzello_TemporaryKey.pfx" />
   </ItemGroup>
   <ItemGroup>
