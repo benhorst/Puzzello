@@ -23,10 +23,7 @@
     }
 
     function footest() {
-
-        this.construct = function () {
-
-        }
+        this.construct = function () {  }
     }
 
     // main test running function. encapsulate to make commenting out easy up top.

@@ -17,8 +17,8 @@
         }
 
         // place a possible move in the active slot (show to players, allow to confirm)
-        this.setActiveMove = function (card) {
-            this.activeMove = new Move(card, new RowCol(0, 0));
+        this.setActiveMove = function (player, card) {
+            this.activeMove = new Move(player, card, new RowCol(0, 0));
             this.updateView();
         }
 
@@ -48,11 +48,18 @@
 
                     // check if in the bounds of the current move
                     if (instance.activeMove) {
-                        var colpos = instance.activeMove.position.col - x;
-                        var rowpos = instance.activeMove.position.row - y;
-                        if (colpos > 0 && instance.activeMove.card.data[colpos]
-                            && rowpos > 0 && instance.activeMove.card.data[rowpos]) {
-
+                        var colpos = x - instance.activeMove.position.col;  // TODO: this is flipped somehow. bad. colums are rows or soemthing.
+                        var rowpos = y - instance.activeMove.position.row;
+                        if (rowpos >= 0 && instance.activeMove.card.data[rowpos]
+                            && colpos >= 0 && instance.activeMove.card.data[rowpos][colpos]) {
+                            // For now, straight up apply the move with no checking.
+                            if (instance.activeMove.card.data[rowpos][colpos] === MoveCard.TileEnum.add) {
+                                tileEl.style.background = instance.activeMove.player.color;
+                                tileEl.textContent = "X";
+                            } else if (instance.activeMove.card.data[rowpos][colpos] === MoveCard.TileEnum.remove) {
+                                tileEl.style.background = "none";
+                                tileEl.textContent = "";
+                            }
                         }
                     }
 
@@ -66,12 +73,12 @@
             // eventually, this UI interaction will be more intuitive, but we'll use some clunky UI to prototype
             var cancelButton = createWithClass("input", "play-cancel");
             cancelButton.setAttribute("type", "button");
-            cancelButton.addEventListener('click', function () { this.cancelActiveMove(); }, false);
+            cancelButton.addEventListener('click', function () { instance.cancelActiveMove(); }, false);
             cancelButton.value = "Cancel Move";
 
             var commitMoveButton = createWithClass("input", "play-commit");
             commitMoveButton.setAttribute("type", "button");
-            commitMoveButton.addEventListener('click', function () { this.applyMove(this.activeMove); }, false);
+            commitMoveButton.addEventListener('click', function () { instance.applyMove(instance.activeMove); }, false);
             commitMoveButton.value = "Commit Move";
 
             container.appendChild(cancelButton);

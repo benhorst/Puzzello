@@ -54,6 +54,10 @@
             [[mte.empty, mte.empty, mte.add],
               [mte.empty, mte.remove, mte.empty],
               [mte.add, mte.empty, mte.empty]],
+
+            [[mte.empty, mte.empty, mte.add],
+              [mte.empty, mte.add, mte.empty],
+              [mte.add, mte.empty, mte.empty]],
         ].map(
             MoveCard.createWithData
         );
@@ -68,13 +72,7 @@
 
 
 /*testing*/
-        var move = new Move(player, cards[1], new RowCol(1, 1));
-        playspace.applyMove(move);
-        getById("play-container").appendChild(playspace.constructHtml());
-
-        move = new Move(player, cards[0], new RowCol(0, 0));
-        playspace.applyMove(move);
-        getById("play-container").appendChild(playspace.constructHtml());
+        
 /*end testing*/
     }
 })();

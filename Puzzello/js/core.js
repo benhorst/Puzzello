@@ -30,7 +30,13 @@ function htmlNodeManager(owner, constructfunc) {
     }
 
     function construct() {
-        node = constructFunc.call(owner);
+        let tempNode = constructFunc.call(owner);
+        if (node) {
+            // once the construction has succeeded, remove the old node.
+            node.parentNode.insertBefore(tempNode, node);
+            node.parentNode.removeChild(node);
+        }
+        node = tempNode;
         dirty = false;
     }
 
