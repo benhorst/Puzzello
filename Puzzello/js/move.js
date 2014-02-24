@@ -13,12 +13,14 @@
             // TODO: validate and stuff. possibly remove/replace htmlnode
             this.data = data;
             dirty = true;
+            Assert(!!this.data, "must have data set on a MoveCard");
         }
 
         // to make the html
         this.toHtml = function () {
             var container = createWithClass("div", "move-card");
 
+            var instance = this;
             this.data.forEach(function (row) {
                 var rowEl = createWithClass("div", "row-container");
                 row.forEach(function (tile) {

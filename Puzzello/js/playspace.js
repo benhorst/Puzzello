@@ -49,7 +49,7 @@
                     var tileEl = createWithClass("div", "tile");
                     if (item instanceof Player) {
                         tileEl.style.background = item.color;
-                        tileEl.textContent = "X";
+                        tileEl.textContent = "O";
                     } else {
                         tileEl.textContent = "";
                     }
@@ -63,7 +63,7 @@
                             // For now, straight up apply the move with no checking.
                             if (instance.activeMove.card.data[rowpos][colpos] === MoveCard.TileEnum.add) {
                                 tileEl.style.background = instance.activeMove.player.color;
-                                tileEl.textContent = "X";
+                                tileEl.textContent = "O";
                             } else if (instance.activeMove.card.data[rowpos][colpos] === MoveCard.TileEnum.remove) {
                                 tileEl.style.background = "none";
                                 tileEl.textContent = "";
@@ -96,6 +96,7 @@
             var leftmoveButton = createWithClass("input", "play-leftarrow");
             leftmoveButton.setAttribute("type", "button");
             leftmoveButton.addEventListener('click', function () {
+                if (!instance.activeMove) return;
                 instance.activeMove.position.col--;
                 instance.activeMove.position.col = Math.max(instance.activeMove.position.col, 0);
                 instance.updateView()
@@ -105,6 +106,7 @@
             var rightmoveButton = createWithClass("input", "play-rightarrow");
             rightmoveButton.setAttribute("type", "button");
             rightmoveButton.addEventListener('click', function () {
+                if (!instance.activeMove) return;
                 instance.activeMove.position.col++;
                 instance.activeMove.position.col = Math.min(instance.activeMove.position.col, instance.state.data[0].length - instance.activeMove.card.data[0].length);
                 instance.updateView();
@@ -114,6 +116,7 @@
             var upmoveButton = createWithClass("input", "play-uparrow");
             upmoveButton.setAttribute("type", "button");
             upmoveButton.addEventListener('click', function () {
+                if (!instance.activeMove) return;
                 instance.activeMove.position.row--;
                 instance.activeMove.position.row = Math.max(instance.activeMove.position.row, 0);
                 instance.updateView()
@@ -123,6 +126,7 @@
             var downmoveButton = createWithClass("input", "play-downarrow");
             downmoveButton.setAttribute("type", "button");
             downmoveButton.addEventListener('click', function () {
+                if (!instance.activeMove) return;
                 instance.activeMove.position.row++;
                 instance.activeMove.position.row = Math.min(instance.activeMove.position.row, instance.state.data.length-instance.activeMove.card.data.length);
                 instance.updateView()
@@ -189,16 +193,22 @@
         this.data = Playstate.fiveByFiveEmpty();
 
         this.applyMove = function (move, options) {
-            for (var i = 0; i < move.card.data.length; i++) {
-                var y = i + move.position.row;
-                if (y < 0 || y >= this.data.length) continue;
-                for (var j = 0; j < move.card.data[i].length; j++) {
-                    var x = j + move.position.row;
-                    if (x < 0 || x >= this.data[i].length) continue;
-
-                    this.data[y][x] = Playstate.applySingleTileMove(this.data[y][x], move.card.data[i][j], move);
+            var instance = this;
+            move.card.data.forEach(function(cardRow, cardY) {
+                let stateY = move.position.row + cardY;
+                // if instance row is within the bounds of the state, check columns
+                if(stateY < instance.data.length) {
+                    cardRow.forEach(function(cardCol, cardX) {
+                        let stateX = move.position.col + cardX;
+                        // if instance col is within the bounds of the state, assign
+                        if(cardX < instance.data[0].length) {
+                            instance.data[stateY][stateX] = Playstate.applySingleTileMove(instance.data[stateY][stateX], move.card.data[cardY][cardX], move);
+                        }
+                    });
                 }
-            }
+
+
+            });
             return this;
         }
 

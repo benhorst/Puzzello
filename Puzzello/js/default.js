@@ -58,6 +58,28 @@
             [[mte.empty, mte.empty, mte.add],
               [mte.empty, mte.add, mte.empty],
               [mte.add, mte.empty, mte.empty]],
+
+            // add a few single column/row cards
+            [[mte.add, mte.remove, mte.add]],
+            [[mte.remove, mte.add, mte.remove]],
+            [[mte.remove], [mte.add], [mte.remove]],
+            [[mte.add], [mte.remove], [mte.add]],
+
+            // diagonals
+            [[mte.remove, mte.add],
+                [mte.add, mte.remove]],
+            [[mte.add, mte.remove],
+                [mte.remove, mte.add]],
+
+            // corners
+            [[mte.remove, mte.add],
+                [mte.add, mte.add]],
+            [[mte.add, mte.add],
+                [mte.remove, mte.add]],
+            [[mte.add, mte.remove],
+                [mte.add, mte.add]],
+            [[mte.add, mte.add],
+                [mte.add, mte.remove]]
         ].map(
             MoveCard.createWithData
         );
