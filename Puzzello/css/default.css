@@ -27,7 +27,12 @@
     }
     .playspace > .row > .tile {
         border: thin solid #ddd;
-        flex: 1 0 20px;
-        min-height: 20px;
+        flex: 1 0 40px;
+        flex-align: center;
+        min-height: 40px;
         text-align: center;
+        font-size: 30px;
+    }
+    .playspace .play-arrowbuttons {
+        display: block;
     }

@@ -10,9 +10,17 @@
         }
 
         // take a move and apply it to the committed moves
-        this.applyMove = function (move) {
+        this.applyMove = function (move, updateoptions) {
             this.state.applyMove(move, {});
             this.moves.push(move);
+            if (updateoptions && updateoptions == Playstate.applyMove.ForceUpdate) {
+                this.updateView();
+            }
+        }
+
+        this.applyCurrentMove = function () {
+            this.applyMove(this.activeMove, this.applyMove.DeferUpdate);
+            this.activeMove = null;
             this.updateView();
         }
 
@@ -35,9 +43,9 @@
             var container = createWithClass("div", "playspace");
             var instance = this;
             // todo: check for active move and set the move as some sort of overlay class that displays the outcome
-            this.state.data.forEach(function (row, x) {
+            this.state.data.forEach(function (row, y) {
                 var rowEl = createWithClass("div", "row");
-                row.forEach(function (item, y) {
+                row.forEach(function (item, x) {
                     var tileEl = createWithClass("div", "tile");
                     if (item instanceof Player) {
                         tileEl.style.background = item.color;
@@ -78,11 +86,57 @@
 
             var commitMoveButton = createWithClass("input", "play-commit");
             commitMoveButton.setAttribute("type", "button");
-            commitMoveButton.addEventListener('click', function () { instance.applyMove(instance.activeMove); }, false);
+            commitMoveButton.addEventListener('click', function () {
+                instance.applyCurrentMove();
+            }, false);
             commitMoveButton.value = "Commit Move";
+
+
+            var movecontainer = createWithClass("div", "play-arrowbuttons");
+            var leftmoveButton = createWithClass("input", "play-leftarrow");
+            leftmoveButton.setAttribute("type", "button");
+            leftmoveButton.addEventListener('click', function () {
+                instance.activeMove.position.col--;
+                instance.activeMove.position.col = Math.max(instance.activeMove.position.col, 0);
+                instance.updateView()
+            }, false);
+            leftmoveButton.value = " < ";
+
+            var rightmoveButton = createWithClass("input", "play-rightarrow");
+            rightmoveButton.setAttribute("type", "button");
+            rightmoveButton.addEventListener('click', function () {
+                instance.activeMove.position.col++;
+                instance.activeMove.position.col = Math.min(instance.activeMove.position.col, instance.state.data[0].length - instance.activeMove.card.data[0].length);
+                instance.updateView();
+            }, false);
+            rightmoveButton.value = " > ";
+
+            var upmoveButton = createWithClass("input", "play-uparrow");
+            upmoveButton.setAttribute("type", "button");
+            upmoveButton.addEventListener('click', function () {
+                instance.activeMove.position.row--;
+                instance.activeMove.position.row = Math.max(instance.activeMove.position.row, 0);
+                instance.updateView()
+            }, false);
+            upmoveButton.value = " ^ ";
+
+            var downmoveButton = createWithClass("input", "play-downarrow");
+            downmoveButton.setAttribute("type", "button");
+            downmoveButton.addEventListener('click', function () {
+                instance.activeMove.position.row++;
+                instance.activeMove.position.row = Math.min(instance.activeMove.position.row, instance.state.data.length-instance.activeMove.card.data.length);
+                instance.updateView()
+            }, false);
+            downmoveButton.value = " v ";
+
+            movecontainer.appendChild(leftmoveButton);
+            movecontainer.appendChild(rightmoveButton);
+            movecontainer.appendChild(upmoveButton);
+            movecontainer.appendChild(downmoveButton);
 
             container.appendChild(cancelButton);
             container.appendChild(commitMoveButton);
+            container.appendChild(movecontainer);
 
             return container;
         }
@@ -121,6 +175,8 @@
         this.htmlNode = new HtmlNodeManager(this, this.constructHtml);
     }
 
+    Playstate.applyMove = { ForceUpdate: "update", DeferUpdate: "defer" };
+
     Playspace.newGame = function (player) {
         var ps = new Playspace();
         var pstate = new Playstate();
@@ -134,13 +190,13 @@
 
         this.applyMove = function (move, options) {
             for (var i = 0; i < move.card.data.length; i++) {
-                var x = i + move.position.col;
-                if (x < 0 || x >= this.data.length) continue;
+                var y = i + move.position.row;
+                if (y < 0 || y >= this.data.length) continue;
                 for (var j = 0; j < move.card.data[i].length; j++) {
-                    var y = j + move.position.row;
-                    if (y < 0 || y >= this.data[i].length) continue;
+                    var x = j + move.position.row;
+                    if (x < 0 || x >= this.data[i].length) continue;
 
-                    this.data[x][y] = Playstate.applySingleTileMove(this.data[x][y], move.card.data[i][j], move);
+                    this.data[y][x] = Playstate.applySingleTileMove(this.data[y][x], move.card.data[i][j], move);
                 }
             }
             return this;
