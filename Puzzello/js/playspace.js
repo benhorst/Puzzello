@@ -10,18 +10,36 @@
         }
 
         // take a move and apply it to the committed moves
+        // accept a move and options (currently, options do nothing)
+        // return whether the move was successful
         this.applyMove = function (move, updateoptions) {
-            this.state.applyMove(move, {});
-            this.moves.push(move);
-            if (updateoptions && updateoptions == Playstate.applyMove.ForceUpdate) {
-                this.updateView();
+            try {
+                this.state = this.state.applyMove(move, {});
+                this.moves.push(move);
+                if (updateoptions && updateoptions == Playstate.applyMove.ForceUpdate) {
+                    this.updateView();
+                }
+            } catch (ex) {
+                if (ex instanceof InvalidMoveError) {
+                    LogMessage("Invalid move, " + ex.reason);
+                } else {
+                    // re-throw anything else
+                    throw (ex);
+                }
+                return false;
             }
+            return true;
         }
 
-        this.applyCurrentMove = function () {
-            this.applyMove(this.activeMove, this.applyMove.DeferUpdate);
-            this.activeMove = null;
-            this.updateView();
+        // apply this.activeMove immediately
+        // returns whether the move was successfully applied
+        this.applyActiveMove = function () {
+            if (this.applyMove(this.activeMove, this.applyMove.DeferUpdate)) {
+                this.activeMove = null;
+                this.updateView();
+                return true;
+            }
+            return false;
         }
 
         // place a possible move in the active slot (show to players, allow to confirm)
@@ -49,9 +67,9 @@
                     var tileEl = createWithClass("div", "tile");
                     if (item instanceof Player) {
                         tileEl.style.background = item.color;
-                        tileEl.textContent = "O";
+                        //tileEl.textContent = "O";
                     } else {
-                        tileEl.textContent = "";
+                        //tileEl.textContent = "";
                     }
 
                     // check if in the bounds of the current move
@@ -63,10 +81,10 @@
                             // For now, straight up apply the move with no checking.
                             if (instance.activeMove.card.data[rowpos][colpos] === MoveCard.TileEnum.add) {
                                 tileEl.style.background = instance.activeMove.player.color;
-                                tileEl.textContent = "O";
+                                //tileEl.textContent = "O";
                             } else if (instance.activeMove.card.data[rowpos][colpos] === MoveCard.TileEnum.remove) {
                                 tileEl.style.background = "none";
-                                tileEl.textContent = "";
+                                //tileEl.textContent = "";
                             }
                         }
                     }
@@ -87,7 +105,7 @@
             var commitMoveButton = createWithClass("input", "play-commit");
             commitMoveButton.setAttribute("type", "button");
             commitMoveButton.addEventListener('click', function () {
-                instance.applyCurrentMove();
+                instance.applyActiveMove();
             }, false);
             commitMoveButton.value = "Commit Move";
 
@@ -193,6 +211,7 @@
     function Playstate() {
         this.data = Playstate.fiveByFiveEmpty();
 
+        // Throws InvalidMoveError if the move is invalid.
         this.applyMove = function (move, options) {
             // don't apply moves that don't exist.
             if (!move) return;
@@ -207,17 +226,8 @@
                         let stateX = move.position.col + cardX;
                         // if newState col is within the bounds of the state, assign
                         if (cardX < newState.data[0].length) {
-                            try {
-                                newState.data[stateY][stateX] = Playstate.applySingleTileMove(newState.data[stateY][stateX], move.card.data[cardY][cardX], move);
-                            } catch (ex) {
-                                if (ex instanceof InvalidMoveError) {
-                                    LogMessage("Invalid Move. " + ex.reason + " Please try again.");
-                                    return instance;
-                                } else {
-                                    // rethrow the exception, this was not expected.
-                                    throw (ex);
-                                }
-                            }
+                            // allow the applySingleTileMove method to throw InvalidMoveError up to the next function
+                            newState.data[stateY][stateX] = Playstate.applySingleTileMove(newState.data[stateY][stateX], move.card.data[cardY][cardX], move);
                         }
                     });
                 }
