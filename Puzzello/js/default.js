@@ -37,6 +37,8 @@
         var playspace = Playspace.newGame(player);
         getById("play-container").appendChild(playspace.getHtmlNode());
 
+        LogMessage("Created a board...");
+
         var mte = MoveCard.TileEnum;
         var cards = [
             [[mte.empty, mte.empty, mte.empty],
@@ -89,7 +91,8 @@
         cards.forEach(function (card) {
             card.getHtmlNode().addEventListener('click', MoveCard.onclick(card), false);
         });
-        
+        LogMessage("generated some cards...");
+
         getById("hand-container").appendChild(hand.getHtmlNode());
 
 

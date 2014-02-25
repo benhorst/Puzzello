@@ -52,7 +52,7 @@ function RowCol(row, col) {
 function LogMessage(str) {
     let div = createWithClass("div", "log-message");
     div.textContent = str;
-    document.body.appendChild(div);
+    getById("log-container").appendChild(div);
 }
 
 (function () {

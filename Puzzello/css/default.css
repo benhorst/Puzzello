@@ -35,3 +35,8 @@
     .playspace .play-arrowbuttons {
         display: block;
     }
+
+#log-container {
+    max-height: 400px;
+    overflow-y:auto;
+}

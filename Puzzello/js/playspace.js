@@ -34,10 +34,13 @@
         // apply this.activeMove immediately
         // returns whether the move was successfully applied
         this.applyActiveMove = function () {
-            if (this.applyMove(this.activeMove, this.applyMove.DeferUpdate)) {
-                this.activeMove = null;
-                this.updateView();
-                return true;
+            if(this.activeMove){
+                if (this.applyMove(this.activeMove, this.applyMove.DeferUpdate)) {
+                    this.activeMove = null;
+                    this.updateView();
+                    LogMessage("Successfully applied move.");
+                    return true;
+                }
             }
             return false;
         }
