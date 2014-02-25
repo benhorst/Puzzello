@@ -48,6 +48,34 @@
             this.updateView();
         }
 
+        this.moveActiveMoveLeft = function () {
+            if (!this.activeMove) return;
+            this.activeMove.position.col--;
+            this.activeMove.position.col = Math.max(this.activeMove.position.col, 0);
+            this.updateView();
+        }
+
+        this.moveActiveMoveRight = function () {
+            if (!this.activeMove) return;
+            this.activeMove.position.col++;
+            this.activeMove.position.col = Math.min(this.activeMove.position.col, this.state.data[0].length - this.activeMove.card.data[0].length);
+            this.updateView();
+        }
+
+        this.moveActiveMoveUp = function () {
+            if (!this.activeMove) return;
+            this.activeMove.position.row--;
+            this.activeMove.position.row = Math.max(this.activeMove.position.row, 0);
+            this.updateView();
+        }
+
+        this.moveActiveMoveDown = function () {
+            if (!this.activeMove) return;
+            this.activeMove.position.row++;
+            this.activeMove.position.row = Math.min(this.activeMove.position.row, this.state.data.length - this.activeMove.card.data.length);
+            this.updateView();
+        }
+
         this.updateView = function () {
             this.htmlNode.refresh();
         }
@@ -104,9 +132,7 @@
 
             var commitMoveButton = createWithClass("input", "play-commit");
             commitMoveButton.setAttribute("type", "button");
-            commitMoveButton.addEventListener('click', function () {
-                instance.applyActiveMove();
-            }, false);
+            commitMoveButton.addEventListener('click', function () { instance.applyActiveMove(); }, false);
             commitMoveButton.value = "Commit Move";
 
 
@@ -114,40 +140,28 @@
             var leftmoveButton = createWithClass("input", "play-leftarrow");
             leftmoveButton.setAttribute("type", "button");
             leftmoveButton.addEventListener('click', function () {
-                if (!instance.activeMove) return;
-                instance.activeMove.position.col--;
-                instance.activeMove.position.col = Math.max(instance.activeMove.position.col, 0);
-                instance.updateView()
+                instance.moveActiveMoveLeft();
             }, false);
             leftmoveButton.value = " < ";
 
             var rightmoveButton = createWithClass("input", "play-rightarrow");
             rightmoveButton.setAttribute("type", "button");
             rightmoveButton.addEventListener('click', function () {
-                if (!instance.activeMove) return;
-                instance.activeMove.position.col++;
-                instance.activeMove.position.col = Math.min(instance.activeMove.position.col, instance.state.data[0].length - instance.activeMove.card.data[0].length);
-                instance.updateView();
+                instance.moveActiveMoveRight();
             }, false);
             rightmoveButton.value = " > ";
 
             var upmoveButton = createWithClass("input", "play-uparrow");
             upmoveButton.setAttribute("type", "button");
             upmoveButton.addEventListener('click', function () {
-                if (!instance.activeMove) return;
-                instance.activeMove.position.row--;
-                instance.activeMove.position.row = Math.max(instance.activeMove.position.row, 0);
-                instance.updateView()
+                instance.moveActiveMoveUp();
             }, false);
             upmoveButton.value = " ^ ";
 
             var downmoveButton = createWithClass("input", "play-downarrow");
             downmoveButton.setAttribute("type", "button");
             downmoveButton.addEventListener('click', function () {
-                if (!instance.activeMove) return;
-                instance.activeMove.position.row++;
-                instance.activeMove.position.row = Math.min(instance.activeMove.position.row, instance.state.data.length-instance.activeMove.card.data.length);
-                instance.updateView()
+                instance.moveActiveMoveDown();
             }, false);
             downmoveButton.value = " v ";
 
@@ -159,6 +173,25 @@
             container.appendChild(cancelButton);
             container.appendChild(commitMoveButton);
             container.appendChild(movecontainer);
+
+            if (!this.keylistener) {
+                this.keylistener = function (ev) {
+                    if (ev.keyCode === 37) { // left-arrow
+                        instance.moveActiveMoveLeft();
+                    } else if (ev.keyCode === 38) { // up-arrow
+                        instance.moveActiveMoveUp();
+                    } else if (ev.keyCode === 39) { // right-arrow
+                        instance.moveActiveMoveRight();
+                    } else if (ev.keyCode === 40) { // down-arrow
+                        instance.moveActiveMoveDown();
+                    } else if (ev.keyCode === 13) { // enter
+                        instance.applyActiveMove();
+                    } else if (ev.keyCode === 27) { // esc
+                        instance.cancelActiveMove();
+                    }
+                }
+                document.body.addEventListener('keyup', this.keylistener);
+            }
 
             return container;
         }
