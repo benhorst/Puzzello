@@ -1,4 +1,5 @@
-﻿
+﻿(function () {
+'use strict';
 function htmlNodeManager(owner, constructfunc) {
     var node = null;
     var dirty = false;
@@ -48,5 +49,34 @@ function RowCol(row, col) {
     this.col = col;
 }
 
+function LogMessage(str) {
+    let div = createWithClass("div", "log-message");
+    div.textContent = str;
+    document.body.appendChild(div);
+}
+
+(function () {
+    function InvalidMoveError(code, reason) {
+        Assert(InvalidMoveError.Codes.isValid(code), "InvalidMoveError: code provided is invalid (" + code + ")");
+        Assert(typeof reason === "string", "InvalidMoveError: reason provided is not a string");
+        this.code = code;
+        this.reason = reason;
+    }
+
+    let codes = { NothingToRemove: "NothingToRemove" };
+    codes.isValid = function(code) {
+        return !!this[code];
+    }
+    Object.defineProperty(InvalidMoveError, "Codes", {
+        value: codes,
+        writeable: false
+    });
+
+    window.InvalidMoveError = InvalidMoveError;
+})();
+
 window.RowCol = RowCol;
 window.HtmlNodeManager = htmlNodeManager;
+window.LogMessage = LogMessage;
+
+})();

@@ -3,5 +3,8 @@
 Might need a refactor of "playspace" "playstate" "move" "movecard"
 -- those names aren't really satisfying me right now. There's confusion between move/movecard and playspace just sucks as a thing at all.
 
-playspace.constructHtml needs some lovin for validating the move and whether it can be applied there.
--- should decide where that validation should lie. ?move? class? -- there's already logic in 'move'. Some of that can be turned into a validator.
+playspace.constructHtml needs some lovin for validating 
+the move and whether it can be applied there.
+-- should decide where that validation should lie. 
+?move? class? -- there's already logic in 'playstate'. 
+Some of that can be turned into a validator.

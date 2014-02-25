@@ -18,7 +18,7 @@
 
     function assert(condition, message) {
         if (!condition) {
-            console.warn(arguments.callee.caller);
+//            console.warn(arguments.callee.caller);
             if (window.HardAsserts) {
                 throw ("ASSERT: " + message);
             } else if (window.TestMode) {

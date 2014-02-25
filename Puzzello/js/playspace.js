@@ -56,7 +56,7 @@
 
                     // check if in the bounds of the current move
                     if (instance.activeMove) {
-                        var colpos = x - instance.activeMove.position.col;  // TODO: this is flipped somehow. bad. colums are rows or soemthing.
+                        var colpos = x - instance.activeMove.position.col;
                         var rowpos = y - instance.activeMove.position.row;
                         if (rowpos >= 0 && instance.activeMove.card.data[rowpos]
                             && colpos >= 0 && instance.activeMove.card.data[rowpos][colpos]) {
@@ -151,7 +151,8 @@
         }
 
         this.handleTileClick = function (ev, x, y) {
-            if (this.state == 'aiming a card') { // TODO
+            if (this.state == 'aiming a card') {
+                // TODO - make this a work item as soon as possible or/and remove dead code.
                 //generate speculative state
                 //generate the html including that move
                 //insert the temp html (letting click events pass through to here?)
@@ -193,28 +194,40 @@
         this.data = Playstate.fiveByFiveEmpty();
 
         this.applyMove = function (move, options) {
+            // don't apply moves that don't exist.
+            if (!move) return;
+
+            var newState = this.copy();
             var instance = this;
             move.card.data.forEach(function(cardRow, cardY) {
                 let stateY = move.position.row + cardY;
-                // if instance row is within the bounds of the state, check columns
-                if(stateY < instance.data.length) {
+                // if newState row is within the bounds of the state, check columns
+                if(stateY < newState.data.length) {
                     cardRow.forEach(function(cardCol, cardX) {
                         let stateX = move.position.col + cardX;
-                        // if instance col is within the bounds of the state, assign
-                        if(cardX < instance.data[0].length) {
-                            instance.data[stateY][stateX] = Playstate.applySingleTileMove(instance.data[stateY][stateX], move.card.data[cardY][cardX], move);
+                        // if newState col is within the bounds of the state, assign
+                        if (cardX < newState.data[0].length) {
+                            try {
+                                newState.data[stateY][stateX] = Playstate.applySingleTileMove(newState.data[stateY][stateX], move.card.data[cardY][cardX], move);
+                            } catch (ex) {
+                                if (ex instanceof InvalidMoveError) {
+                                    LogMessage("Invalid Move. " + ex.reason + " Please try again.");
+                                    return instance;
+                                } else {
+                                    // rethrow the exception, this was not expected.
+                                    throw (ex);
+                                }
+                            }
                         }
                     });
                 }
-
-
             });
-            return this;
+            return newState;
         }
 
         this.copy = function () {
             var state = new Playstate();
-            state.data = this.data.slice(0); // copy the only member
+            state.data = this.data.map(function (row) { return row.slice(0); }); // copy the only member. ensure deep copy.
             return state;
         }
     }
@@ -228,7 +241,7 @@
             case MoveCard.TileEnum.remove:
                 // if(data != player) throw InvalidMoveError cannot remove on anything other than the player's tile
                 if (current == MoveCard.TileEnum.empty) {
-                    throw (new Error("Invalid Move: cannot place a tile here"));
+                    throw (new InvalidMoveError(InvalidMoveError.Codes.NothingToRemove, "A [Remove] tile must be placed on an existing token"));
                 }
                 result = MoveCard.TileEnum.empty;
                 break;
@@ -237,6 +250,9 @@
                 break;
             case MoveCard.TileEnum.multiply:
                 // todo: check if valid, do something more than add a plain marker
+                if (current == MoveCard.TileEnum.empty) {
+                    throw(new Error(""))
+                }
                 current = move.player;
                 break;
             case MoveCard.TileEnum.empty:
