@@ -61,6 +61,7 @@
     <Content Include="images\splashscreen.scale-100.png" />
     <Content Include="images\storelogo.scale-100.png" />
     <Content Include="js\core.js" />
+    <Content Include="js\deck.js" />
     <Content Include="js\default.js" />
     <Content Include="css\default.css" />
     <Content Include="js\hand.js" />
