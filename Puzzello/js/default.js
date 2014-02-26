@@ -93,11 +93,6 @@
         });
         LogMessage("generated some cards...");
 
-        getById("hand-container").appendChild(hand.getHtmlNode());
-
-
-/*testing*/
-        
-/*end testing*/
+        getById("hand-container").appendChild(hand.getHtmlNode());  
     }
 })();
