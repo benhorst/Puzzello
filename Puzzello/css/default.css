@@ -1,0 +1,42 @@
+﻿.move-card {
+    display:inline-block;
+    flex-direction: column;
+    margin: 10px;
+    border: thin solid #ddd;
+}
+    .move-card > .row-container {
+        display:flex;
+        flex-direction: row;
+    }
+    .move-card > .row-container > .tile {
+        border: thin solid #ddd;
+        flex: 1 0 20px;
+        min-height: 20px;
+        text-align:center;
+    }
+    
+.playspace {
+    display:inline-block;
+    flex-direction: column;
+    margin: 10px;
+    border: thin solid #ddd;
+}
+    .playspace > .row {
+        display:flex;
+        flex-direction: row;
+    }
+    .playspace > .row > .tile {
+        border: thin solid #ddd;
+        flex: 1 0 40px;
+        min-height: 40px;
+        text-align: center;
+        font-size: 30px;
+    }
+    .playspace .play-arrowbuttons {
+        display: block;
+    }
+
+#log-container {
+    max-height: 400px;
+    overflow-y:auto;
+}
